@@ -25,17 +25,9 @@
 # 
 # Dependencies:
 #
-# - GNU Awk (gawk)
-#     Das Script nutzt fortgeschrittene AWK-Funktionen wie asorti() und
-#     benutzerdefinierte Vergleichsfunktionen, die in anderen AWK-Versionen wie 
-#     mawk meist nicht unterstützt werden. Daher ist hier explizit GNU Awk
-#     erforderlich.
+# - gawk (GNU Awk)
 # - find (aus findutils)
-#     Für den Fallback-Mechanismus wird ind verwendet, um im aktuellen Verzeichnis
-#     nach einer passenden CSV-Datei zu suchen.
-#
 # - head (aus coreutils)
-#     Zur Überprüfung der ersten Zeile der gefundenen CSV-Dateien.
 #
 # History:   2025-06-15, 2025-06-20
 #

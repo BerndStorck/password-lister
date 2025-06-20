@@ -35,8 +35,22 @@
 # License:   GNU General Public License 3.0
 #
 
+# > Value settings: < =======================================================
+
+# > Constants: < ------------------------------------------------------------
+
+readonly PROG_NAME="Passwort File Converter"
+readonly ORIGINAL_SCRIPT_NAME="convert.sh"
+readonly VERSION="1.2.0"
+readonly CURRENT_SCRIPT_NAME="${0##*/}"
+
+# > Defaults: < ------------------------------------------------------------
+
 csv_input_file="${1:-Vivaldi-Passwörter.csv}"
 output_file="vivaldi-passwords.txt"
+
+
+# > Functions: < ============================================================
 
 load_config() {
   local config_file="$1"
@@ -50,16 +64,14 @@ load_config() {
 }
 
 # Searching for configuration file:
-file_found=false
-for config_path in "$HOME/getpass" "$HOME/.config/getpass" "$HOME/.config" "$HOME" "/etc/getpass" "/etc" "."; do
-  configuration_file="${config_path}/getpass.conf"
-  # echo "[DEBUG] configuration_file: \"$configuration_file\""
-  if [ -f "$configuration_file" ]; then
-    load_config "$configuration_file"
-    file_found=true
-    break
-  fi
-done
+# Searching for configuration file:
+config_file=$(./find_config.sh getpass getpass F getpass.conf "$HOME/callerCfg:$HOME/.config/callerCfg:$HOME/.config:$HOME:/etc/callerCfg:/etc:.")
+if [ $? -ne 0 ] || [ -z "$config_file" ]; then
+    echo "FEHLER: Keine Konfigurationsdatei gefunden!" >&2
+    exit 1
+else
+    load_config "$config_file"
+fi
 
 # Fallback: Falls CSV nicht existiert, suche im aktuellen Verzeichnis
 if [ ! -f "$csv_input_file" ]; then

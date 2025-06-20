@@ -124,16 +124,24 @@ load_config() {
 # > main < ============================================================
 
 # Searching for configuration file:
-file_found=false
-for config_path in "$HOME/getpass" "$HOME/.config/getpass" "$HOME/.config" "$HOME" "/etc/getpass" "/etc" "."; do
-  configuration_file="${config_path}/getpass.conf"
-  # echo "[DEBUG] configuration_file: \"$configuration_file\""
-  if [ -f "$configuration_file" ]; then
-    load_config "$configuration_file"
-    file_found=true
-    break
-  fi
-done
+config_file=$(./find_config.sh getpass getpass F getpass.conf "$HOME/callerCfg:$HOME/.config/callerCfg:$HOME/.config:$HOME:/etc/callerCfg:/etc:.")
+if [ $? -ne 0 ] || [ -z "$config_file" ]; then
+    echo "FEHLER: Keine Konfigurationsdatei gefunden!" >&2
+    exit 1
+else
+    load_config "$config_file"
+fi
+
+#file_found=false
+#for config_path in "$HOME/getpass" "$HOME/.config/getpass" "$HOME/.config" "$HOME" "/etc/getpass" "/etc" "."; do
+#  configuration_file="${config_path}/getpass.conf"
+#  # echo "[DEBUG] configuration_file: \"$configuration_file\""
+#  if [ -f "$configuration_file" ]; then
+#    load_config "$configuration_file"
+#    file_found=true
+#    break
+#  fi
+#done
 
 # > Call parameter Analysis: < ----------------------------------------
 

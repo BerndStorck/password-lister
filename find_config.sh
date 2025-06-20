@@ -58,13 +58,17 @@ if [ "$UILANG" = "Deutsch" ]; then
     --hilf         Diese Hilfe anzeigen
     --version|-V   Versionsinfo anzeigen
 
- AUFRUFBEISPIELE
+ AUFRUFBEISPIELE (gekürzt)
 
-  $CURRENT_SCRIPT_NAME getpass getpass F getpass.conf "$HOME/callerCfg:$HOME/.config/callerCfg:$HOME/.config:$HOME:/etc/callerCfg:/etc:."
-  $CURRENT_SCRIPT_NAME getpass convert I getpass.conf "$HOME/callerCfg:$HOME/.config/callerCfg:$HOME/.config:$HOME:/etc/callerCfg:/etc:."
+   $CURRENT_SCRIPT_NAME getpass getpass F getpass.conf ".:$HOME/callerCfg:$HOME/.config/callerCfg:$HOME/…"
+   $CURRENT_SCRIPT_NAME getpass convert I getpass.conf ".:$HOME/callerCfg:$HOME/.config/callerCfg:$HOME/…"
 
-  Falls der dritte Parameter "F" (Familienname) ist, wird "callerCfg" durch den zweiten Parameter ersetzt, z.B. "getpass".
-  Falls der dritte Parameter "I" (Individueller Name) ist, wird "callerCfg" durch den zweiten Parameter ersetzt, z.B. "convert".
+ Eine komplette Pfadliste könnte so aussehen:
+
+   ".:$HOME/callerCfg:$HOME/.config/callerCfg:$HOME/.config:$HOME:/etc/callerCfg:/etc"
+
+ Falls der dritte Parameter "F" (Familienname) ist, wird "callerCfg" durch den zweiten Parameter ersetzt, z.B. "getpass".
+ Falls der dritte Parameter "I" (Individueller Name) ist, wird "callerCfg" durch den zweiten Parameter ersetzt, z.B. "convert".
 
  Programmiert von Bernd Storck, facebook.com/BStLinux/
  (GNU/General Public License version 2.0)
@@ -83,13 +87,17 @@ else  # English help:
     --help         Show this help message.
     --version|-V   Show version information.
 
- USAGE EXAMPLES
+USAGE EXAMPLES (shortened):
 
-  $CURRENT_SCRIPT_NAME getpass getpass F getpass.conf "$HOME/callerCfg:$HOME/.config/callerCfg:$HOME/.config:$HOME:/etc/callerCfg:/etc:."
-  $CURRENT_SCRIPT_NAME getpass convert I getpass.conf "$HOME/callerCfg:$HOME/.config/callerCfg:$HOME/.config:$HOME:/etc/callerCfg:/etc:."
+  find_config.sh getpass getpass F getpass.conf ".:/home/bernds/callerCfg:/home/bernds/.config/callerCfg:/home/bernds/…"
+  find_config.sh getpass convert I getpass.conf ".:/home/bernds/callerCfg:/home/bernds/.config/callerCfg:/home/bernds/…"
 
-  If the third parameter is "F" (family name), "callerCfg" will be replaced by the second parameter, e.g., "getpass".
-  If the third parameter is "I" (individual name), "callerCfg" will be replaced by the second parameter, e.g., "convert".
+ A complete path list might look like this:
+
+   ".:/home/bernds/callerCfg:/home/bernds/.config/callerCfg:/home/bernds/.config:/home/bernds:/etc/callerCfg:/etc"
+
+ If the third parameter is "F" (family name), "callerCfg" will be replaced by the second parameter, e.g., "getpass".
+ If the third parameter is "I" (individual name), "callerCfg" will be replaced by the second parameter, e.g., "convert".
 
  Programmed by Bernd Storck, facebook.com/BStLinux/
  (GNU/General Public License version 2.0)

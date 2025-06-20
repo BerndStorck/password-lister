@@ -21,6 +21,8 @@ A lightweight collection of Bash scripts for managing password exports from Viva
 #### lspass.sh
 `lspass.sh` displays the entire password list in a user-friendly format. It uses tools like `grep` (with color highlighting) and `less` to facilitate easy browsing.
 
+#### find_dirs.sh
+`find_dirs.sh` locates a directory from a colon-separated path list that may include a placeholder ("callerCfg"). It substitutes the placeholder with a specified value — either the project name or the caller script's name — and returns the first existing directory. This ensures consistent directory resolution for scripts like `convert.sh`, `getpass.sh`, and `lspass.sh`.
 
 ### Dependencies
 
@@ -73,6 +75,9 @@ Eine leichtgewichtige Sammlung von Bash-Skripten zur Nutzung eines Passwort-Expo
 
 #### lspass.sh
 `lspass.sh` zeigt die komplette Passwortliste in einem benutzerfreundlichen Format an. Mithilfe von `grep` (mit farblicher Hervorhebung) und `less` können die Inhalte bequem durchgesehen werden.
+
+#### find_dirs.sh 
+`find_dirs.sh` ermittelt Verzeichnisse aus einer durch Doppelpunkte getrennten Pfadliste mit einem Platzhalter („callerCfg“). Das Skript ersetzt den Platzhalter durch einen vorgegebenen Wert — entweder Projektname oder Skriptname — und liefert das erste vorhandene Verzeichnis. So wird eine einheitliche Verzeichnissuche für `convert.sh`, `getpass.sh` und `lspass.sh` sichergestellt.
 
 ### Abhängigkeiten
 

@@ -1,0 +1,10 @@
+# Directories:
+convert_Entwicklungsversionen
+Datendateien
+KI
+
+# Dateien:
+*.*~
+*.txt
+*.csv
+

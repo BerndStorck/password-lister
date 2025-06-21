@@ -1,0 +1,10 @@
+UILANG="Türkçe"
+LABEL_PASSWORD_FILE="Şifre dosyası"
+
+ERROR="HATA"
+ERR_MISSING_CONFIGURATION_FILE="Yapılandırma dosyası bulunamadı!"
+THE_FILE="Dosya"
+NOT_FOUND="bulunamadı"
+
+WARNING="UYARI"
+DISALLOWED_OPTION="İzin verilmeyen seçenek"

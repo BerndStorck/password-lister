@@ -1,0 +1,10 @@
+UILANG="Lëtzebuergesch"
+LABEL_PASSWORD_FILE="Passwuert-Datei"
+
+ERROR="FEELER"
+ERR_MISSING_CONFIGURATION_FILE="Konfiguratiounsdatei net fonnt!"
+THE_FILE="D'Datei"
+NOT_FOUND="net fonnt"
+
+WARNING="WARNUNG"
+DISALLOWED_OPTION="Net zougelaat Optioun"

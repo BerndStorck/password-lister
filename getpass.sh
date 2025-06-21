@@ -17,7 +17,7 @@
 # - less
 # - awk
 #
-# History:   2025-04-21, 2025-06-14, 2025-06-15, 2025-06-20
+# History:   2025-04-21, 2025-06-14, 2025-06-15, 2025-06-20, 2025-06-21
 #
 # Copyright: 2025, Bernd Storck
 # License:   GNU General Public License 3.0
@@ -31,10 +31,44 @@
 
 readonly PROG_NAME="Passwort Lister"
 readonly ORIGINAL_SCRIPT_NAME="getpass.sh"
-readonly VERSION="1.2.0"
+readonly VERSION="1.3.0"
 readonly CURRENT_SCRIPT_NAME="${0##*/}"
 
 password_file="$HOME/.local/share/passwords/vivaldi-passwords.txt"
+
+# Defines the name of the language file according to system language:
+language_file_extension="${LANG:0:2}"
+language_file_extension="${language_file_extension,,}"
+readonly language_file_name="getpass.lang.$language_file_extension"
+# echo "[DEBUG] Sprachdefinitionsdatei: \"$language_file_name\"" > /dev/stderr; sleep 2
+
+# Searching for an external language file:
+file_found=false
+for config_path in "." "$HOME/getpass" "$HOME/.config/getpass" "$HOME/.config" "$HOME" "/etc/getpass" "/etc"; do
+  language_file="${config_path}/$language_file_name"
+  # echo "[DEBUG] language_file: \"$language_file\""; exit
+  if [ -f "$language_file" ]; then
+    source "${language_file}"
+    file_found=true
+    break
+  fi
+done
+
+# If no language file is found the following
+# will define English text as default output:
+if ! "$file_found" ; then
+  UILANG="English"
+  LABEL_PASSWORD_FILE="Password file"
+  LABEL_PASSWORD_FILE="Passwortdatei"
+
+  ERROR="ERROR"
+  ERR_MISSING_CONFIGURATION_FILE="No configuration file found!"
+  THE_FILE="The file"
+  NOT_FOUND="was not found"
+
+  WARNING="WARNING"
+  DISALLOWED_OPTION="Disallowed option"
+fi
 
 
 # > Functions: < ============================================================
@@ -126,7 +160,7 @@ load_config() {
 # Searching for configuration file:
 config_file=$(./find_config.sh getpass getpass F getpass.conf "$HOME/callerCfg:$HOME/.config/callerCfg:$HOME/.config:$HOME:/etc/callerCfg:/etc:.")
 if [ $? -ne 0 ] || [ -z "$config_file" ]; then
-    echo "FEHLER: Keine Konfigurationsdatei gefunden!" >&2
+    echo "$ERROR: $ERR_MISSING_CONFIGURATION_FILE" >&2
     exit 1
 else
     load_config "$config_file"
@@ -170,21 +204,21 @@ while getopts "p:hV\#" opt; do
       password_file="$OPTARG"  # Passwortdatei
       ;;
     h) usage; exit 0 ;;  # Hilfe anzeigen
-    \#) echo "$VERSION"; exit 0 ;;  # Versionsnummer anzeigen
+    \#) echo "$VERSION"; exit 0 ;;  # Display version number / Versionsnummer anzeigen
     V)
        printf "%s (Version %s)\n" "$ORIGINAL_SCRIPT_NAME" "$VERSION"
        exit 0
        ;;
-    \?) echo "WARNUNG: Ungültige Option: -$OPTARG" > /dev/stderr ;;
+    \?) echo "$WARNING: $DISALLOWED_OPTION: -$OPTARG" > /dev/stderr ;;
   esac
 done
 shift $((OPTIND-1))
 
-echo "Passworddatei: \"$password_file\""
+echo "$LABEL_PASSWORD_FILE: \"$password_file\""
 sleep 1
 
 if [ ! -f "$password_file" ]; then
-  echo "Datei \"$password_file\" wurde nicht gefunden."
+  echo "$ERROR: $THE_FILE \"$password_file\" $NOT_FOUND."
   exit 1
 fi
 

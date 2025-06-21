@@ -1,0 +1,10 @@
+UILANG="Italiano"
+LABEL_PASSWORD_FILE="File delle password"
+
+ERROR="ERRORE"
+ERR_MISSING_CONFIGURATION_FILE="Nessun file di configurazione trovato!"
+THE_FILE="Il file"
+NOT_FOUND="non è stato trovato"
+
+WARNING="ATTENZIONE"
+DISALLOWED_OPTION="Opzione non consentita"

@@ -1,0 +1,11 @@
+UILANG="English"
+LABEL_PASSWORD_FILE="Password file"
+LABEL_PASSWORD_FILE="Passwortdatei"
+
+ERROR="ERROR"
+ERR_MISSING_CONFIGURATION_FILE="No configuration file found!"
+THE_FILE="The file"
+NOT_FOUND="was not found"
+
+WARNING="WARNING"
+DISALLOWED_OPTION="Disallowed option"

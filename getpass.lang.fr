@@ -1,0 +1,10 @@
+UILANG="Français"
+LABEL_PASSWORD_FILE="Fichier de mots de passe"
+
+ERROR="ERREUR"
+ERR_MISSING_CONFIGURATION_FILE="Aucun fichier de configuration trouvé !"
+THE_FILE="Le fichier"
+NOT_FOUND="n'a pas été trouvé"
+
+WARNING="AVERTISSEMENT"
+DISALLOWED_OPTION="Option non autorisée"

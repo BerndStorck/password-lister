@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 #
 # convert.sh
 # Version: Look at the first constant definitions below!
@@ -14,7 +14,7 @@
 #       The sorting key is derived from the domain name:
 #       The second-to-last subfield is considered when the name is dot-separated.
 #       For example: "accounts.ard.de" yields "ard", "colibri.ai" yields "colibri".
-# 
+#
 #   de: Dabei werden nur Feld $1 (Name) und Feld $4 (Passwort) genutzt.
 #       Der Sortierschluessel wird aus dem Domainnamen abgeleitet:
 #       Es wird das jeweils zweitletzte Subfeld betrachtet, wenn der Name durch Punkte getrennt ist.
@@ -22,18 +22,22 @@
 #
 # Usage:
 # ./convert.sh
-# 
+#
 # Dependencies:
 #
 # - gawk (GNU Awk)
 # - find (aus findutils)
 # - head (aus coreutils)
 #
-# History:   2025-06-15, 2025-06-20
+# History:   2025-06-15, 2025-06-20, 2025-06-23, 2025-06-27
+#
+# Author:    Bernd Storck, Berlin
 #
 # Copyright: 2025, Bernd Storck, https://www.facebook.com/BStLinux/
 # License:   GNU General Public License 3.0
 #
+
+# set -x  # -euo pipefail
 
 # > Value settings: < =======================================================
 
@@ -41,14 +45,19 @@
 
 readonly PROG_NAME="Passwort File Converter"
 readonly ORIGINAL_SCRIPT_NAME="convert.sh"
-readonly VERSION="1.2.0"
+readonly VERSION="2.0.0"
 readonly CURRENT_SCRIPT_NAME="${0##*/}"
+
+readonly VIVALDI_FIRST_LINE='name,url,username,password,note'
+readonly FIREFOX_FIRST_LINE='"url","username","password","httpRealm","formActionOrigin","guid","timeCreated","timeLastUsed","timePasswordChanged"'
 
 # > Defaults: < ------------------------------------------------------------
 
+input_format="chromium"
 csv_input_file="${1:-Vivaldi-Passwörter.csv}"
 output_file="vivaldi-passwords.txt"
-
+passwords_display_start_column=35
+csv_input_file_found=0
 
 # > Functions: < ============================================================
 
@@ -63,29 +72,88 @@ load_config() {
   done < "$config_file"
 }
 
+normalize_header() {
+    echo "$1" | tr -d '\r\n"' | tr -d ' ' | tr '[:upper:]' '[:lower:]'
+}
+
+get_prefix() {
+  local file="$1" base first_word
+
+  if [ -z "${1:-}" ]; then
+    printf 'ERROR: no filename provided to get_prefix\n' >&2
+    return 1
+  fi
+
+  base="${file##*/}"  # Removes path.
+  # Nimmt alles bis zum ersten Leerzeichen oder Bindestrich:
+  first_word="${base%%[- _]*}"   # Extracts everything up to the first space or hyphen.
+
+  if (( BASH_VERSINFO[0] >= 4 )); then
+    first_word="${first_word,,}"  # To lower case.
+  else
+    first_word="$(printf '%s' "$first_word" | tr '[:upper:]' '[:lower:]')"
+  fi
+
+  printf '%s\n' "$first_word"
+}
+
+
+# > main < ============================================================
+
 # Searching for configuration file:
-# Searching for configuration file:
-config_file=$(./find_config.sh getpass getpass F getpass.conf "$HOME/callerCfg:$HOME/.config/callerCfg:$HOME/.config:$HOME:/etc/callerCfg:/etc:.")
+config_file=$(./find_config.sh getpass getpass F getpass.conf "$PWD:$HOME/callerCfg:$HOME/.config/callerCfg:$HOME/.config:$HOME:/etc/callerCfg:/etc")
 if [ $? -ne 0 ] || [ -z "$config_file" ]; then
     echo "FEHLER: Keine Konfigurationsdatei gefunden!" >&2
     exit 1
 else
-    load_config "$config_file"
+    :
+    # load_config "$config_file"
 fi
 
-# Fallback: Falls CSV nicht existiert, suche im aktuellen Verzeichnis
-if [ ! -f "$csv_input_file" ]; then
-  for current_file in $(find . -maxdepth 1 -iname "*.csv"); do
-    first_line="$(head -n 1 "$current_file")"
-    if [ "$first_line" = 'name,url,username,password,note' ]; then
-      csv_input_file="$current_file"
-      break
-    fi
-  done
+vivaldi_first_line_normalized="$(normalize_header "$VIVALDI_FIRST_LINE")"
+firefox_first_line_normalized="$(normalize_header "$FIREFOX_FIRST_LINE")"
+
+if [ -f "$csv_input_file" ]; then  # Assume source browser:
+  first_line="$(head -n 1 "$csv_input_file")"
+  first_line_normalized=$(normalize_header "$first_line")
+  case "$first_line_normalized" in 
+    "$vivaldi_first_line_normalized")
+       input_format='chromium'
+       prefix="$(get_prefix "$csv_input_file")"
+       output_file="$prefix-passwords.txt"
+       csv_input_file_found=1
+       ;;
+    "$firefox_first_line_normalized")
+       input_format='firefox'
+       prefix="$(get_prefix "$csv_input_file")"
+       output_file="$prefix-passwords.txt"
+       csv_input_file_found=1
+       ;;
+  esac
+else  # Fallback: CSV im aktuellen Verzeichnis finden:
+   while IFS= read -r -d '' current_file; do
+     first_line="$(head -n1 "$current_file")"
+     first_line_normalized=$(normalize_header "$first_line")
+     case "$first_line_normalized" in
+       "$vivaldi_first_line_normalized")
+         input_format='chromium'
+         csv_input_file="$current_file"
+         csv_input_file_found=1
+         break
+         ;;
+       "$firefox_first_line_normalized")
+         input_format='firefox'
+         csv_input_file="$current_file"
+         csv_input_file_found=1
+         break
+         ;;
+     esac
+   done < <(find . -maxdepth 1 -iname '*.csv' -print0)
 fi
 
-if [ ! -f "$csv_input_file" ]; then
-  echo "CSV input file not found!"
+if [ "$csv_input_file_found" -eq 0 ]; then
+  echo "CSV input file not found!" >&2
+# echo "Kein gültiges CSV-Format im aktuellen Verzeichnis gefunden." >&2
   exit 1
 fi
 
@@ -103,36 +171,59 @@ fi
 # mit dem die Datensaetze in sortierter Reihenfolge ausgegeben werden.
 #
 # Zusaetzlich werden mit der Laenge des Namens ein "dot-padding" erzeugt, sodass der Passwortteil
-# immer in Spalte 33 beginnt (kannst du natuerlich anpassen).
+# in der Ausgabe standardmaessig immer in Spalte 35 beginnt ('passwords_display_start_column').
 
-awk -F, 'NR==1 { next }  # Kopfzeile ueberspringen
+awk -F, -v input_format="$input_format" -v password_start="$passwords_display_start_column" 'NR==1 { next }  # Kopfzeile ueberspringen
 {
+
+  if ( input_format == "chromium" ) {
+    name = $1; pwd = $4;
+  } else if ( input_format == "firefox" ) {
+    name = $1; pwd = $3;
+  }
+
   # Felder $1 und $4 extrahieren und von Anfuehrungszeichen befreien
-  name = $1; pwd = $4;
   gsub(/^"|"$/, "", name);
   gsub(/^"|"$/, "", pwd);
 
-  # Speichern in Arrays – Index = (NR-1) wegen Kopfzeilenübersprung
-  i = NR - 1;
+  gsub(/^https:\/\/|^http:\/\//, "", name);
+
+  # Speichern in Arrays:
+  i = NR - 1;  # Index = (NR-1) weil die Kopfzeile uebersprungen wurde.
   names[i] = name;
   pwds[i]  = pwd;
 
-  # zum Sortieren die Domain ermitteln:
-  n = split(name, parts, ".");  # Zerlegt 'name' anhand des Punktes.
-  postfix = sprintf("%05d", i)
-  if (n > 1) {
-    key = tolower(parts[n-1]);  # Zweitletztes Subfeld als Schluessel
-  } else {
-    key = tolower(name);        # Falls kein Punkt vorhanden ist
-  }
-  # AWK-Äquivalent zu: 'key="$(grep -Eo '[-_[:alnum:]]{2,}$' <<< "$key")"'
-  if (match(key, /[-_[:alnum:]]{2,}$/)) {
-    key = substr(key, RSTART, RLENGTH);
-  }
-  keys[i] = key"-"postfix;
+  key = get_key(name);  # Ermittelt zum Sortieren die Domain. Sie wird zum Sortierschluessel.
+
+  postfix = sprintf("%05d", i);
+  keys[i] = key"-"postfix;  # key ist das Array der Sortierschluessel, dies sind diesfalls die Domainnamen.
   # print keys[i]
 
   count = i;  # Anzahl der eingelesenen Zeilen
+}
+
+function get_key (name) {
+
+  # split() ist eine Funktion, die das String-Argument (name) anhand
+  # des Trennzeichens (".") in einen Array (parts) aufteilt.
+  #
+  # Beim Aufruf der Funktion split wird das Array parts bei jedem
+  # Aufruf neu initialisiert/ueberschrieben.
+
+  total_number_of_parts = split(name, parts, ".");  # Zerlegt 'name' anhand des Punktes.
+  # 'parts' ist das Array, das nun alle Felder enthaelt.
+
+  if (total_number_of_parts > 1) {
+    key = tolower(parts[total_number_of_parts - 1]);  # Zweitletztes Subfeld als Schluessel
+  } else {
+    key = tolower(name);        # Falls kein Punkt vorhanden ist
+  }
+  # AWK-Aequivalent zu: 'key="$(grep -Eo '[-_[:alnum:]]{2,}$' <<< "$key")"'
+  if (match(key, /[-_[:alnum:]]{2,}$/)) {
+    key = substr(key, RSTART, RLENGTH);
+  }
+
+  return key
 }
 
 # Benutzerdefinierte Vergleichsfunktion fuer case-insensitive Sortierung
@@ -141,9 +232,9 @@ function ci_sort(i1, v1, i2, v2) {
 }
 
 function dot_padding(txt, len_name, dots_count, dots) {
-  # Berechne das Dot-Padding (Spalte 33):
+  # Berechne das Dot-Padding:
   len_name = length(txt);
-  dots_count = 33 - len_name;
+  dots_count = (password_start - 2) - len_name;  # 1 space before and after the dots)
   if (dots_count < 0) dots_count = 0;
   dots = sprintf("%" dots_count "s", "");
   gsub(/ /, ".", dots);  # Ersetzt alle Leerzeichen durch Punkte

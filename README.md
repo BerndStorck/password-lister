@@ -102,7 +102,7 @@ Eine Sammlung von schlanken Bash-Skripten zur Suche und Anzeige von Passwörtern
 
 ### Abhängigkeiten
 
-Die Scripte erfordern die folgenden Tools unter Linux:
+Die Skripte erfordern die folgenden Linux-Programme:
 - `gawk` (GNU awk)
 - `find` (von findutils)
 - `head` (von coreutils)

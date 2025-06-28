@@ -1,3 +1,5 @@
+[![ShellCheck](https://img.shields.io/badge/Code%20Style-ShellCheck-green.svg?style=flat-square)](https://github.com/koalaman/shellcheck)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](./LICENSE)
 
 # GetPass – Password List Manager
 
@@ -13,9 +15,9 @@ A lightweight collection of Bash scripts for managing password exports from Chro
 ### The Programs
 
 #### convert.sh
-`convert.sh` processes a Chromium CSV password export, as well as, optionally, a Firefox password export, converting it into a formatted password list. It extracts only the fields for domain name and password. The name is padded with dots so that the password appears in a fixed column. The sorting key is based on the domain name, using the second-to-last subfield of the dot-separated name.
+Processes CSV exports of passwords from Chromium-style or Firefox browsers into a human-readable, formatted password list. It extracts only the fields for domain name and password. Each entry’s name is dot-padded so passwords line up in a fixed column. The sorting key is based on the domain name, using the second-to-last subfield of the dot-separated name.
 
-- The following web browsers export passwords in the Chromium format: Arc Browser, Chromium, Brave, Google Chrome, Microsoft Edge, Opera, Vivaldi, Yandex Browser.
+- The following web browsers export passwords in the Chromium format: Arc Browser, Brave, Chromium, Google Chrome, Microsoft Edge, Opera, Vivaldi, Yandex Browser.
 
 - The following programs can export passwords in the Firefox format: Basilisk (via Password Backup Tool), Firefox, K-Meleon (via Password Extractor Add-On), Mypal, New Moon, Pale Moon (via Password Backup Tool), SeaMonkey (via Password Extractor Add-On), Thunderbird (via Password Extractor Add-On), Waterfox.
 
@@ -38,15 +40,26 @@ The scripts require the following tools on Linux:
 
 ### Usage
 
-- **Convert the CSV export into a password list:**
-  ```bash
-  ./convert.sh
-  ```
+#### Convert the default CSV export into a password list
 
-- **Extract passwords for a specific domain:**
-  ```bash
-  ./getpass.sh domain
-  ```
+    ./convert.sh
+
+#### Convert a specific CSV export file
+
+    ./convert.sh path/to/Firefox-Passwords.csv
+
+#### Extract passwords for a specific domain:
+
+    # plain domain (matches any TLD)
+    ./getpass.sh wikipedia
+
+It finds all domains regardless of the TLD. For example, `getpass example` will find passwords for `example.com`, `example.de`, `example.fr`, etc.
+
+    # with generic TLD
+    ./getpass.sh wikipedia.org
+
+    # Without parameter
+    ./getpass.sh
 
 If no domain is provided, `getpass.sh` will show the complete list via `lspass.sh`.
 
@@ -74,7 +87,7 @@ Eine Sammlung von schlanken Bash-Skripten zur Suche und Anzeige von Passwörtern
 #### convert.sh
 `convert.sh` verarbeitet einen Chromium-CSV-Passwortexport sowie, optional, einen Firefox-Passwortexport und wandelt ihn in eine formatierte Passwortliste um. Es extrahiert nur die Felder für den Domainnamen und das Passwort. Hinter den Namen wird eine Reihe von Punkten gesetzt, sodass alle Passwörter in der selben Spalte beginnen. Der Sortierschlüssel beruht auf dem Domainnamen, wofür der zweitletzte Teil der durch Punkte untergliederten Adressangabe herangezogen wird.
 
-- Die folgenden Webbrowser exportieren Passwörter im Chromium-Format: Arc Browser, Chromium, Brave, Google Chrome, Microsoft Edge, Opera, Vivaldi, Yandex Browser.
+- Die folgenden Webbrowser exportieren Passwörter im Chromium-Format: Arc Browser, Brave, Chromium, Google Chrome, Microsoft Edge, Opera, Vivaldi, Yandex Browser.
 
 - Die folgenden Programme können Passwörter im Firefox-Format exportieren: Basilisk (via Password Backup Tool), Firefox, K-Meleon (via Password Extractor Add-On), Mypal, New Moon, Pale Moon (via Password Backup Tool), SeaMonkey (via Password Extractor Add-On), Thunderbird (via Password Extractor Add-On), Waterfox.
 
@@ -84,7 +97,7 @@ Eine Sammlung von schlanken Bash-Skripten zur Suche und Anzeige von Passwörtern
 #### lspass.sh
 `lspass.sh` zeigt die komplette Passwortliste in einem benutzerfreundlichen Format an. Mithilfe von `grep` (mit farblicher Hervorhebung) und `less` können die Inhalte bequem durchgesehen werden.
 
-#### find_dirs.sh 
+#### find_dirs.sh
 `find_dirs.sh` ermittelt Verzeichnisse aus einer durch Doppelpunkte getrennten Pfadliste mit einem Platzhalter („callerCfg“). Das Skript ersetzt den Platzhalter durch einen vorgegebenen Wert — entweder Projektname oder Skriptname — und liefert das erste vorhandene Verzeichnis. So wird eine einheitliche Verzeichnissuche für `convert.sh`, `getpass.sh` und `lspass.sh` sichergestellt.
 
 ### Abhängigkeiten
@@ -97,17 +110,28 @@ Die Scripte erfordern die folgenden Tools unter Linux:
 
 ### Programmaufrufe
 
-- **Konvertiere den CSV-Export von Vivaldi in eine Passwortliste:**
-  ```bash
-  ./convert.sh
-  ```
+#### Konvertierung des Standard-CSV-Exports in eine Passwortliste
 
-- **Lasse Dir die Passwörter für eine bestimmte Domain anzeigen:**
-  ```bash
-  ./getpass.sh domain
-  ```
+    ./convert.sh
 
-Falls keine Domain angegeben wird, wird die vollständige Passwortliste mit allen Passwörtern angezeigt.
+#### Konvertierung einer bestimmten Passwortexportdatei
+
+    ./convert.sh path/to/Firefox-Passwords.csv
+
+#### Die Passwörter für eine bestimmte Domain anzeigen
+
+    # Reine Domain (für beliebige Top Level Domains)
+    ./getpass.sh wikipedia
+
+Diese Aufrufform findet alle Domains unabhängig von der TLD. Zum Beispiel wird `getpass example` die Passwörter für `example.com`, `example.de`, `example.fr` usw. finden.
+
+    # Mit Angabe der Top Level Domain
+    ./getpass.sh wikipedia.org
+ 
+    # Aufruf ohne Parameter
+    ./getpass.sh
+
+Falls keine Domain angegeben wird, wird die ganze Passwortliste mit den Passwörtern aller Domains angezeigt.
 
 ### Autor
 Bernd Storck
